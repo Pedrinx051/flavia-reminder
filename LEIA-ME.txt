@@ -1,0 +1,45 @@
+FLÁVIA REMINDER — VERSÃO 2.0 🌷
+================================
+
+1) TESTAR NO WINDOWS
+Extraia a pasta inteira, sem separar os arquivos.
+Abra index.html no Chrome ou Edge.
+Clique em + para adicionar um lembrete.
+Para visualizar a interface preenchida, clique em “Ver layout com lembretes de exemplo”.
+
+2) SURPRESA DO PEDRO
+Cadastre ou edite um lembrete cujo título OU descrição contenha a palavra Pedro.
+Clique em Salvar: o bonequinho do Pedro aparece entrando pelo lado direito,
+com a mensagem “TU TEM QUE COLOCAR UM LEMBRETE PRA MIM?!?!?!”.
+Maiúsculas e minúsculas funcionam: Pedro, PEDRO, pedro.
+É um mascote genérico ilustrado, não um retrato do Pedro.
+
+3) O QUE FUNCIONA
+Adicionar, editar, excluir e concluir lembretes; adiar 10 minutos;
+repetir diariamente, durante dias úteis ou semanalmente; calendário;
+histórico; exportar/importar backup; interface adaptada ao celular.
+O armazenamento é local neste navegador (localStorage).
+
+4) O QUE AINDA NÃO FUNCIONA
+Notificações push automáticas com o site fechado e alertas na tela
+bloqueada do iPhone. Isso exige uma etapa adicional com Web Push,
+agendamento em servidor e permissão no iPhone.
+
+5) INSTALAÇÃO NO IPHONE (ETAPA SEGUINTE)
+Publicar estes arquivos em hospedagem HTTPS gratuita (ex.: GitHub Pages).
+Abrir o endereço no Safari no iPhone, tocar Compartilhar e
+Adicionar à Tela de Início. Somente em HTTPS o service worker funciona.
+
+6) IMPORTANTE
+O índice de dados da versão 1 foi preservado: flavia-reminder-v1.
+No mesmo navegador e origem, os lembretes antigos permanecem disponíveis.
+Abrir o arquivo localmente e abrir o site publicado depois cria origens
+separadas, portanto exporte e importe o backup para migrar.
+
+Nenhum servidor externo, cadastro ou serviço pago é necessário nesta versão.
+
+
+VERSÃO 3 — Pedro Pixel 🤨
+Atualizado o mascote do pop-up para assets/pedro-pixel.png.
+Para publicar no GitHub Pages: envie os arquivos desta pasta para a raiz do repositório flavia-reminder, mantendo a pasta assets. Substitua os arquivos existentes e confirme o commit.
+O site salva lembretes no navegador; notificações automáticas com app fechado ainda não foram implementadas.

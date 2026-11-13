@@ -4,7 +4,8 @@
   const API = 'https://flavia-reminder-api.pedrohaubert52.workers.dev';
   const LOCAL_KEY = 'flavia-reminder-push-access';
   const TASKS_KEY = 'flavia-reminder-v1';
-  let sub = null, busy = false, timer = null;
+  let sub = null, busy = false, timer = null, pulling = false;
+  const ACTION_CURSOR='flavia-v6-action-cursor';
   const $ = id => document.getElementById(id);
   const sleep = ms => new Promise(resolve => setTimeout(resolve,ms));
   function message(s, isError=false) {
@@ -76,6 +77,26 @@
     }catch(err){if(show)message(err.message,true);console.warn('Falha ao sincronizar notificações:',err);}
     finally{busy=false;}
   }
+  async function pullActions(){
+    if(pulling||!localStorage.getItem(LOCAL_KEY)||!allowed())return;
+    pulling=true;
+    try{
+      const registration=await navigator.serviceWorker.ready;
+      const subscription=await registration.pushManager.getSubscription();
+      if(!subscription)return;
+      // Ler ações antes de sincronizar evita reverter um adiamento feito com o app fechado.
+      for(let page=0;page<4;page++){
+        const cursor=Number(localStorage.getItem(ACTION_CURSOR)||0);
+        const result=await request('/api/actions?endpoint='+encodeURIComponent(subscription.endpoint)+'&after='+cursor);
+        const actions=result.actions||[];
+        if(!actions.length)break;
+        window.dispatchEvent(new CustomEvent('flavia-push-actions',{detail:actions}));
+        localStorage.setItem(ACTION_CURSOR,String(actions[actions.length-1].id));
+        if(actions.length<200)break;
+      }
+    }catch(err){console.warn('Não foi possível consultar ações anteriores:',err);}
+    finally{pulling=false;}
+  }
   async function activate() {
     if(!allowed()){message('Notificações Web Push indisponíveis. No iPhone, instale pelo Safari na Tela de Início (iOS 16.4+).',true);return;}
     const button=$('pushEnable');button.disabled=true;
@@ -88,13 +109,14 @@
         localStorage.setItem(LOCAL_KEY,token);
       }
       const {publicKey}=await request('/api/config',{},false);
-      const reg=await navigator.serviceWorker.register('./sw.js?v=5');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=6.1');
       await navigator.serviceWorker.ready;
       const permission=await permissionRequest;
       if(permission!=='granted')throw Error('Permissão de notificações não concedida no iPhone.');
       sub=await reg.pushManager.getSubscription();
       if(!sub) sub=await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:publicKeyBytes(publicKey)});
       await request('/api/register',{method:'POST',body:JSON.stringify({subscription:sub.toJSON()})});
+      await pullActions();
       await sync(true);
       $('pushTest').disabled=false;
       message('Notificações ativadas! Toque em “Enviar teste”. 💜');
@@ -117,13 +139,33 @@
   window.addEventListener('flavia-reminders-updated',()=>{
     clearTimeout(timer);timer=setTimeout(()=>sync(false),1100);
   });
-  window.addEventListener('online',()=>sync(false));
+  window.addEventListener('online',()=>pullActions().then(()=>sync(false)));
+  window.addEventListener('focus',()=>pullActions().then(()=>sync(false)));
+  navigator.serviceWorker?.addEventListener('message',ev=>{if(ev.data?.type==='flavia-action-updated')pullActions().then(()=>sync(false));});
   $('pushEnable')?.addEventListener('click',activate);
   $('pushTest')?.addEventListener('click',test);
   $('pushReset')?.addEventListener('click',clearCode);
+  // Corrige automaticamente instalações antigas cujo SW ainda está na V3.
+  // Não pede permissão por conta própria; só atualiza a infraestrutura já instalada.
+  async function atualizarSW(){
+    if(!allowed())return;
+    try{
+      const reg=await navigator.serviceWorker.register('./sw.js?v=6.1');
+      await reg.update();
+      if(localStorage.getItem(LOCAL_KEY)&&Notification.permission==='granted'){
+        await pullActions();
+        await sync(false);
+        message('Notificações V6 atualizadas 🌷. Faça um teste para confirmar.');
+      }
+    }catch(err){
+      console.warn('Falha ao atualizar o service worker:',err);
+      message('Falha ao atualizar notificações. Reabra o app com internet e tente novamente.',true);
+    }
+  }
+  setTimeout(atualizarSW,1200);
   if(localStorage.getItem(LOCAL_KEY) && allowed()){
     $('pushTest').disabled=false;
     message('Código salvo. Se já autorizou, pode testar.');
-    setTimeout(()=>sync(false),2500);
+    setTimeout(()=>pullActions().then(()=>sync(false)),2500);
   }
 })();

@@ -62,6 +62,7 @@
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
     catch (e) { toast('Não foi possível salvar. Confira o armazenamento do navegador.'); console.warn(e); }
     render();
+    window.dispatchEvent(new Event('flavia-reminders-updated'));
   }
   function toast(message) {
     const el = $('toast');
@@ -239,6 +240,26 @@
       persist();toast('Combinado! Adiado 10 minutos ⏰');
     }
   });
+  // Ações feitas pela notificação (com o aplicativo fechado) são importadas do servidor.
+  window.addEventListener('flavia-push-actions',event=>{
+    let changed=false;
+    for(const record of (event.detail||[])){
+      const ref=record.reminder_ref;
+      if(typeof ref!=='string')continue;
+      const sep=ref.lastIndexOf('|');if(sep<0)continue;
+      const id=ref.slice(0,sep),date=ref.slice(sep+1);
+      if(!isDate(date))continue;
+      const task=tasks.find(t=>t.id===id);if(!task)continue;
+      if(record.action==='done'&&!task.completed[date]){
+        task.completed[date]=record.performed_at||new Date().toISOString();changed=true;
+      }else if(record.action==='snooze'&&record.next_due_at&&!task.completed[date]){
+        task.snoozes??={};
+        if(task.snoozes[date]!==record.next_due_at){task.snoozes[date]=record.next_due_at;changed=true;}
+      }
+    }
+    if(changed){persist();toast('Lembretes atualizados pelas notificações! 🌷');}
+  });
+
   $('addBtn').addEventListener('click',()=>openForm());
   $('cancelBtn').addEventListener('click',closeForm);
   $('cancelX').addEventListener('click',closeForm);
