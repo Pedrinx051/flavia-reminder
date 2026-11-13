@@ -30,9 +30,3 @@
   .pedro-mascot { width: 43%; right: -5px; }
   .pedro-bubble { top: 10%; }
 }
-
-/* Notificações: etapa Web Push */
-.push-panel{margin-top:18px;padding:18px;border:1px solid #e5c6f0;border-radius:22px;background:linear-gradient(135deg,#fff,#f7ebff);box-shadow:0 8px 28px rgba(103,45,130,.05)}
-.push-panel strong{display:block;color:#6f308f;font-size:16px}.push-panel p{font-size:12px;line-height:1.55;color:#765e83;margin:9px 0}
-.push-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.push-actions button{font-size:12px;padding:10px 12px;min-height:40px}
-.push-actions button:disabled{opacity:.55;cursor:not-allowed}.push-reset{border:0;background:none;text-decoration:underline;color:#8d60a2;font:inherit;font-size:11px;padding:7px 0;cursor:pointer}

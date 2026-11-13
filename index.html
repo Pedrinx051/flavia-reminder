@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=5">
+  <link rel="stylesheet" href="./styles.css">
   <title>Flávia Reminder 🌷</title>
 </head>
 <body>
@@ -71,13 +71,7 @@
     </div>
 
     <div class="page hidden" id="reminders">
-      <section class="content-section"><div class="section-heading"><h2>Todos os lembretes <span class="outline-heart">♡</span></h2></div><p class="page-caption">Sua rotina, do seu jeitinho. 🌷</p><div id="allTasks"></div><div class="push-panel" aria-label="Notificações no iPhone">
-        <strong>🔔 Notificações no iPhone</strong>
-        <p>Ative para receber os lembretes com o aplicativo fechado. Instale pelo Safari na tela inicial antes de ativar.</p>
-        <div class="push-actions"><button id="pushEnable" type="button" class="primary-btn">Ativar notificações</button><button id="pushTest" type="button" class="secondary-btn" disabled>Enviar teste</button></div>
-        <p id="pushStatus" role="status">Os lembretes continuam salvos no aparelho.</p>
-        <button id="pushReset" type="button" class="push-reset">Trocar código de acesso</button>
-      </div></section>
+      <section class="content-section"><div class="section-heading"><h2>Todos os lembretes <span class="outline-heart">♡</span></h2></div><p class="page-caption">Sua rotina, do seu jeitinho. 🌷</p><div id="allTasks"></div><div class="notice">🔔 Os avisos automáticos na tela bloqueada do iPhone ainda não estão ativados nesta versão.</div></section>
     </div>
 
     <div class="page hidden" id="calendar">
@@ -123,7 +117,6 @@
     </div>
   </div>
   <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
-  <script src="./app.js?v=5" defer></script>
-  <script src="./push.js?v=5" defer></script>
+  <script src="./app.js" defer></script>
 </body>
 </html>
