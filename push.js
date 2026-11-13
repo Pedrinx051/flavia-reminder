@@ -51,7 +51,8 @@
         if(!occurs || task.completed?.[localDate])continue;
         let at=new Date(`${localDate}T${task.time}:00`);
         if(task.snoozes?.[localDate])at=new Date(task.snoozes[localDate]);
-        if(!Number.isFinite(at.getTime()) || at.getTime()<Date.now()+1000)continue;
+        // Mantém ocorrências com atraso de até 90 s ao sincronizar, evitando apagar avisos pendentes.
+        if(!Number.isFinite(at.getTime()) || at.getTime()<Date.now()-90000)continue;
         list.push({
           id:`${task.id}|${localDate}`,
           title:String(task.title||'Lembrete').slice(0,90),
@@ -87,7 +88,7 @@
         localStorage.setItem(LOCAL_KEY,token);
       }
       const {publicKey}=await request('/api/config',{},false);
-      const reg=await navigator.serviceWorker.register('./sw.js');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=5');
       await navigator.serviceWorker.ready;
       const permission=await permissionRequest;
       if(permission!=='granted')throw Error('Permissão de notificações não concedida no iPhone.');
