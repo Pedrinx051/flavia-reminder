@@ -1,5 +1,5 @@
-/* Flávia Reminder V6 — notificações com tulipas e ações seguras */
-const CACHE='flavia-reminder-v6.1';
+/* Flávia Reminder V6.3 — notificações com tulipas e ações seguras */
+const CACHE='flavia-reminder-v6.3';
 const API='https://flavia-reminder-api.pedrohaubert52.workers.dev';
 const CORE=['./','./index.html','./styles.css','./app.js','./push.js','./icon.svg','./apple-touch-icon.png','./manifest.webmanifest','./assets/tulips.svg','./assets/study.svg','./assets/pedro-pixel.png','./assets/notificacao-tulipas.png','./assets/badge-tulipa.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)));self.skipWaiting();});

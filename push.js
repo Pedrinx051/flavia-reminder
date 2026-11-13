@@ -1,10 +1,18 @@
-/* Flávia Reminder — Web Push para iPhone instalado pela Tela de Início. */
+/* Flávia Reminder V6.3 — Web Push com ativação persistente. */
 (() => {
   'use strict';
   const API = 'https://flavia-reminder-api.pedrohaubert52.workers.dev';
   const LOCAL_KEY = 'flavia-reminder-push-access';
   const TASKS_KEY = 'flavia-reminder-v1';
+  const ACTIVE_KEY = 'flavia-reminder-push-enabled';
   let sub = null, busy = false, timer = null, pulling = false;
+  let pushIsActive = false, manageOpen = false;
+  function updatePushUi(active) {
+    pushIsActive = Boolean(active);
+    $('pushPanel')?.classList.toggle('hidden', pushIsActive && !manageOpen);
+    $('pushCompact')?.classList.toggle('hidden', !pushIsActive || manageOpen);
+    $('pushHide')?.classList.toggle('hidden', !pushIsActive);
+  }
   const ACTION_CURSOR='flavia-v6-action-cursor';
   const $ = id => document.getElementById(id);
   const sleep = ms => new Promise(resolve => setTimeout(resolve,ms));
@@ -28,7 +36,7 @@
       headers:{'content-type':'application/json',...(auth && token?{'authorization':`Bearer ${token}`}:{})}
     });
     const data=await response.json().catch(()=>({}));
-    if(!response.ok)throw Error(data.erro || `Erro HTTP ${response.status}`);
+    if(!response.ok){const err=Error(data.erro || `Erro HTTP ${response.status}`);err.status=response.status;throw err;}
     return data;
   }
   function buildOccurrences() {
@@ -70,12 +78,29 @@
     try {
       const registration=await navigator.serviceWorker.ready;
       sub=await registration.pushManager.getSubscription();
-      if(!sub){if(show)message('Ative as notificações primeiro.');return;}
+      if(!sub){localStorage.removeItem(ACTIVE_KEY);if(show)message('Assinatura não encontrada. Ative novamente neste aparelho.');updatePushUi(false);return false;}
       const reminders=buildOccurrences();
       const data=await request('/api/sync',{method:'POST',body:JSON.stringify({endpoint:sub.endpoint, reminders})});
       if(show)message(`${data.agendados} ocorrências agendadas para os próximos 90 dias. 🌷`);
-    }catch(err){if(show)message(err.message,true);console.warn('Falha ao sincronizar notificações:',err);}
-    finally{busy=false;}
+      if(Notification.permission === 'granted') localStorage.setItem(ACTIVE_KEY,sub.endpoint);
+      updatePushUi(Notification.permission === 'granted');
+      return true;
+    }catch(err){
+      // Não desativa as notificações por causa de internet instável ou falha temporária do servidor.
+      // O navegador continua inscrito e o Worker ainda pode enviar os lembretes já agendados.
+      const connected=Boolean(sub && Notification.permission === 'granted' && localStorage.getItem(LOCAL_KEY));
+      if(err.status===401 || err.status===403){
+        manageOpen=true;
+        updatePushUi(false);
+        message('O código salvo não foi aceito pelo servidor. Toque em “Trocar código de acesso”.',true);
+      }else{
+        updatePushUi(connected);
+        if(show)message('Avisos ativos, mas não foi possível sincronizar agora. Tentaremos de novo com internet.',true);
+        else console.warn('Sincronização temporariamente indisponível:',err);
+      }
+      console.warn('Falha ao sincronizar notificações:',err);
+      return false;
+    } finally {busy=false;}
   }
   async function pullActions(){
     if(pulling||!localStorage.getItem(LOCAL_KEY)||!allowed())return;
@@ -101,7 +126,8 @@
     if(!allowed()){message('Notificações Web Push indisponíveis. No iPhone, instale pelo Safari na Tela de Início (iOS 16.4+).',true);return;}
     const button=$('pushEnable');button.disabled=true;
     // No iOS, solicitar permissão diretamente a partir do clique, antes de outros awaits.
-    const permissionRequest = Notification.requestPermission();
+    const permissionRequest = Notification.permission === 'granted'
+      ? Promise.resolve('granted') : Notification.requestPermission();
     try{
       let token=localStorage.getItem(LOCAL_KEY);
       if(!token){token=prompt('Digite o código de acesso configurado no servidor (ACCESS_TOKEN):'); if(!token)return;
@@ -109,7 +135,7 @@
         localStorage.setItem(LOCAL_KEY,token);
       }
       const {publicKey}=await request('/api/config',{},false);
-      const reg=await navigator.serviceWorker.register('./sw.js?v=6.1');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=6.3');
       await navigator.serviceWorker.ready;
       const permission=await permissionRequest;
       if(permission!=='granted')throw Error('Permissão de notificações não concedida no iPhone.');
@@ -117,9 +143,13 @@
       if(!sub) sub=await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:publicKeyBytes(publicKey)});
       await request('/api/register',{method:'POST',body:JSON.stringify({subscription:sub.toJSON()})});
       await pullActions();
-      await sync(true);
+      const synchronized = await sync(true);
+      if (!synchronized) return;
       $('pushTest').disabled=false;
-      message('Notificações ativadas! Toque em “Enviar teste”. 💜');
+      message('Notificações ativadas! Use “Gerenciar” para enviar um teste. 💜');
+      localStorage.setItem(ACTIVE_KEY,sub.endpoint);
+      manageOpen = false;
+      updatePushUi(true);
     }catch(err){message(err.message,true);console.warn(err);}
     finally{button.disabled=false;}
   }
@@ -134,7 +164,11 @@
   }
   async function clearCode(){
     if(!confirm('Esquecer o código de acesso salvo neste aparelho?'))return;
-    localStorage.removeItem(LOCAL_KEY);message('Código apagado deste aparelho. Os agendamentos existentes no servidor não foram apagados.');
+    localStorage.removeItem(LOCAL_KEY);
+    localStorage.removeItem(ACTIVE_KEY);
+    $('pushTest').disabled=true;
+    manageOpen=false;updatePushUi(false);
+    message('Código apagado deste aparelho. Os agendamentos existentes no servidor não foram apagados.');
   }
   window.addEventListener('flavia-reminders-updated',()=>{
     clearTimeout(timer);timer=setTimeout(()=>sync(false),1100);
@@ -145,27 +179,57 @@
   $('pushEnable')?.addEventListener('click',activate);
   $('pushTest')?.addEventListener('click',test);
   $('pushReset')?.addEventListener('click',clearCode);
-  // Corrige automaticamente instalações antigas cujo SW ainda está na V3.
-  // Não pede permissão por conta própria; só atualiza a infraestrutura já instalada.
-  async function atualizarSW(){
+  $('pushManage')?.addEventListener('click',()=>{manageOpen=true;updatePushUi(pushIsActive);});
+  $('pushHide')?.addEventListener('click',()=>{manageOpen=false;updatePushUi(pushIsActive);});
+  // Verifica automaticamente o estado real da assinatura ao abrir o aplicativo.
+  // Permissão e assinatura pertencem ao navegador; o marcador local serve apenas à UI.
+  // NUNCA pede permissão automaticamente: o primeiro pedido precisa do clique da pessoa.
+  async function restaurarNotificacoes() {
     if(!allowed())return;
     try{
-      const reg=await navigator.serviceWorker.register('./sw.js?v=6.1');
+      const reg=await navigator.serviceWorker.register('./sw.js?v=6.3');
       await reg.update();
-      if(localStorage.getItem(LOCAL_KEY)&&Notification.permission==='granted'){
+      sub=await reg.pushManager.getSubscription();
+      const token=localStorage.getItem(LOCAL_KEY);
+      if(Notification.permission==='granted' && sub && token){
+        localStorage.setItem(ACTIVE_KEY,sub.endpoint);
+        updatePushUi(true);
+        $('pushTest').disabled=false;
+        message('Avisos ativados neste aparelho. Nada para configurar de novo. 💜');
+        // Sincroniza ocorrências recentes/novas sem pedir ação ou código.
         await pullActions();
         await sync(false);
-        message('Notificações V6 atualizadas 🌷. Faça um teste para confirmar.');
+        return;
+      }
+      localStorage.removeItem(ACTIVE_KEY);
+      updatePushUi(false);
+      $('pushTest').disabled=true;
+      if(Notification.permission==='denied'){
+        message('As notificações foram bloqueadas nas configurações do celular. Libere o site para reativar.',true);
+      }else if(sub && !token){
+        message('A permissão continua ativa, mas falta o código de acesso para sincronizar. Ative novamente.');
+      }else if(token && Notification.permission==='granted'){
+        message('A assinatura de notificações não foi encontrada. Toque em “Ativar notificações” para recuperar.');
       }
     }catch(err){
-      console.warn('Falha ao atualizar o service worker:',err);
-      message('Falha ao atualizar notificações. Reabra o app com internet e tente novamente.',true);
+      // Se a atualização do SW falhar por falta de conexão, tente ler a assinatura instalada.
+      console.warn('Não foi possível verificar as notificações automaticamente:',err);
+      try{
+        const reg=await navigator.serviceWorker.getRegistration();
+        sub=await reg?.pushManager.getSubscription() || null;
+        const active=Notification.permission==='granted' && Boolean(sub) && Boolean(localStorage.getItem(LOCAL_KEY));
+        updatePushUi(active);
+        $('pushTest').disabled=!active;
+        if(active)message('Avisos já ativados. Sincronizaremos quando a internet voltar. 💜');
+        else message('Não foi possível verificar os avisos. Conecte à internet e reabra o aplicativo.',true);
+      }catch{message('Não foi possível verificar as notificações agora.',true);}
     }
   }
-  setTimeout(atualizarSW,1200);
-  if(localStorage.getItem(LOCAL_KEY) && allowed()){
+  // Exibe o estado salvo sem piscar o painel de configuração até a consulta de assinatura.
+  if(localStorage.getItem(ACTIVE_KEY) && localStorage.getItem(LOCAL_KEY) &&
+     allowed() && Notification.permission==='granted') {
+    updatePushUi(true);
     $('pushTest').disabled=false;
-    message('Código salvo. Se já autorizou, pode testar.');
-    setTimeout(()=>pullActions().then(()=>sync(false)),2500);
   }
+  restaurarNotificacoes();
 })();

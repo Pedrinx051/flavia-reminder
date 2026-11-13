@@ -14,9 +14,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=5">
+  <link rel="stylesheet" href="./styles.css?v=6.2">
   <title>Flávia Reminder 🌷</title>
-  <!-- V6.1: recuperação da integração Web Push -->
+  <!-- V6.3: notificações ativadas apenas uma vez por aparelho, com verificação automática -->
 </head>
 <body>
   <svg xmlns="http://www.w3.org/2000/svg" class="svg-icons" aria-hidden="true">
@@ -72,12 +72,12 @@
     </div>
 
     <div class="page hidden" id="reminders">
-      <section class="content-section"><div class="section-heading"><h2>Todos os lembretes <span class="outline-heart">♡</span></h2></div><p class="page-caption">Sua rotina, do seu jeitinho. 🌷</p><div id="allTasks"></div><div class="push-panel" aria-label="Notificações bonitas 🌷">
+      <section class="content-section"><div class="section-heading"><h2>Todos os lembretes <span class="outline-heart">♡</span></h2></div><p class="page-caption">Sua rotina, do seu jeitinho. 🌷</p><div id="allTasks"></div><div id="pushCompact" class="push-compact hidden" role="status"><span>🔔 Avisos ativados</span><button type="button" id="pushManage" class="push-compact-action">Gerenciar</button></div><div class="push-panel" id="pushPanel" aria-label="Configurar notificações">
         <strong>🔔 Notificações bonitas 🌷</strong>
         <p>Receba avisos com tulipas e ações de Concluir ou Adiar, mesmo com o aplicativo fechado. No iPhone, instale pela tela inicial do Safari.</p>
         <div class="push-actions"><button id="pushEnable" type="button" class="primary-btn">Ativar notificações</button><button id="pushTest" type="button" class="secondary-btn" disabled>Enviar teste</button></div>
         <p id="pushStatus" role="status">Os lembretes continuam salvos no aparelho.</p>
-        <button id="pushReset" type="button" class="push-reset">Trocar código de acesso</button>
+        <button id="pushReset" type="button" class="push-reset">Trocar código de acesso</button><button id="pushHide" type="button" class="push-reset push-hide hidden">Ocultar ajustes</button>
       </div></section>
     </div>
 
@@ -86,7 +86,7 @@
     </div>
 
     <div class="page hidden" id="history">
-      <section class="content-section"><div class="section-heading"><h2>Suas conquistas <span class="outline-heart">♡</span></h2></div><p class="page-caption">Cada tarefa concluída merece ser comemorada! ✨</p><div id="historyTasks"></div><div class="notice">💾 Os lembretes ficam salvos neste navegador. Se limpar os dados do Safari ou mudar de aparelho, eles podem desaparecer. Exporte um backup de vez em quando.</div><div class="backup-actions"><button id="exportBtn" class="secondary-btn" type="button"><svg class="ico"><use href="#i-download"/></svg> Exportar backup</button><button id="importBtn" class="secondary-btn" type="button"><svg class="ico"><use href="#i-upload"/></svg> Importar backup</button><input type="file" id="importFile" accept="application/json,.json" class="hidden"></div></section>
+      <section class="content-section"><div class="section-heading"><h2>Suas conquistas <span class="outline-heart">♡</span></h2></div><p class="page-caption">Cada tarefa concluída merece ser comemorada! ✨</p><div id="historyTasks"></div><div class="history-cleanup"><p>Limpe os registros antigos sem desmarcar as tarefas já concluídas.</p><button type="button" id="clearHistoryBtn" class="clear-history-btn" disabled><svg class="ico" aria-hidden="true"><use href="#i-trash"/></svg> Limpar histórico</button></div><div class="notice">💾 Os lembretes ficam salvos neste navegador. Se limpar os dados do Safari ou mudar de aparelho, eles podem desaparecer. Exporte um backup de vez em quando.</div><div class="backup-actions"><button id="exportBtn" class="secondary-btn" type="button"><svg class="ico"><use href="#i-download"/></svg> Exportar backup</button><button id="importBtn" class="secondary-btn" type="button"><svg class="ico"><use href="#i-upload"/></svg> Importar backup</button><input type="file" id="importFile" accept="application/json,.json" class="hidden"></div></section>
     </div>
 
     <div class="bottom-waves" aria-hidden="true"></div>
@@ -124,7 +124,7 @@
     </div>
   </div>
   <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
-  <script src="./app.js?v=6.1" defer></script>
-  <script src="./push.js?v=6.1" defer></script>
+  <script src="./app.js?v=6.2" defer></script>
+  <script src="./push.js?v=6.3" defer></script>
 </body>
 </html>

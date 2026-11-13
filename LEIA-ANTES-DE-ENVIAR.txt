@@ -1,0 +1,26 @@
+FLÁVIA REMINDER V6.3 — NOTIFICAÇÕES ATIVADAS UMA VEZ SÓ
+
+O QUE ESTA CORREÇÃO FAZ
+- Depois de ativadas, as notificações ficam autorizadas pelo navegador/dispositivo.
+- Ao abrir o aplicativo novamente, ele identifica automaticamente a inscrição existente.
+- O cartão grande de ativação fica oculto; aparece a opção discreta "Avisos ativados / Gerenciar".
+- O código de acesso já salvo no navegador é reutilizado sem nova pergunta.
+- Falhas temporárias de internet NÃO fazem o aplicativo pedir ativação de novo.
+- Se as permissões ou a inscrição forem revogadas, o aplicativo orienta a reativação.
+
+COMO ATUALIZAR (GITHUB PAGES)
+1. Abra o repositório Pedrinx051/flavia-reminder na branch main.
+2. Clique em Add file > Upload files.
+3. Envie SOMENTE index.html, push.js e sw.js da pasta extraída, diretamente na RAIZ.
+4. Clique em Commit changes e confira a publicação no GitHub Pages.
+5. Feche e reabra o PWA. Abra a aba Lembretes. A seção grande deve desaparecer se o dispositivo já estiver inscrito.
+6. Use Gerenciar se quiser mandar uma notificação de teste.
+
+NÃO envie este arquivo de instruções, não envie pastas adicionais e NÃO reconfigure o Cloudflare.
+Não desinstale o aplicativo nem apague os dados do site: lembretes e código salvo ficam no armazenamento local do aparelho.
+
+LIMITES
+- A autorização é por aparelho/instalação: em outro celular é necessário ativar uma vez.
+- Limpar dados do navegador, desinstalar em alguns sistemas ou revogar a permissão pode exigir nova ativação.
+- O PWA precisa manter a inscrição Push válida; o app verifica isso automaticamente.
+- O atraso do cron de até cerca de um minuto não é alterado por esta correção.
