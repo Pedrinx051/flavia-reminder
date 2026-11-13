@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 320" fill="none">
+ <defs>
+  <linearGradient id="a" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#f2b6f2"/><stop offset=".45" stop-color="#b975d0"/><stop offset="1" stop-color="#7d45ac"/></linearGradient>
+  <linearGradient id="b" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#d8a0eb"/><stop offset="1" stop-color="#8642bb"/></linearGradient>
+  <linearGradient id="leaf" x1="0" y1="0" x2="1" y2=".9"><stop stop-color="#c8d3a4"/><stop offset="1" stop-color="#739b77"/></linearGradient>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feGaussianBlur stdDeviation="3"/></filter>
+ </defs>
+ <g stroke="#7e9c73" stroke-width="5" stroke-linecap="round">
+  <path d="M10 319Q86 210 189 69"/><path d="M10 319Q65 230 83 117"/><path d="M10 319Q95 222 249 141"/>
+ </g>
+ <path d="M38 296C65 259 117 235 153 230C134 271 79 302 38 296Z" fill="url(#leaf)"/>
+ <path d="M77 245C69 210 70 172 81 145C109 176 115 214 77 245Z" fill="#a2b991"/>
+ <path d="M116 207C151 180 202 187 230 204C194 229 152 233 116 207Z" fill="url(#leaf)"/>
+ <path d="M191 185C213 146 253 129 295 133C272 169 238 185 191 185Z" fill="#b0c89f"/>
+ <g transform="translate(187 75) rotate(20)">
+  <ellipse cx="0" cy="-15" rx="47" ry="44" fill="#9565bd" opacity=".12" filter="url(#shadow)"/>
+  <path d="M0 42C-37 34-53 5-42-32Q-30-65 0-73Q32-57 44-34Q50 13 0 42Z" fill="url(#a)"/>
+  <path d="M0 42C-21 13-26-32 0-75C26-32 20 13 0 42Z" fill="#d6a1e4"/>
+  <path d="M0 42C-44 19-57-15-36-49C-24-30-11 8 0 42Z" fill="#9155bf" opacity=".72"/>
+  <path d="M0 42C44 19 57-15 36-49C24-30 11 8 0 42Z" fill="#c483dc" opacity=".7"/>
+  <path d="M-36-48Q-21-62-2-72M3-72Q26-64 37-48" stroke="#fff" stroke-opacity=".52" stroke-width="4" stroke-linecap="round"/>
+ </g>
+ <g transform="translate(84 121) rotate(-12) scale(.76)">
+  <path d="M0 42C-37 34-53 5-42-32Q-30-65 0-73Q32-57 44-34Q50 13 0 42Z" fill="url(#b)"/>
+  <path d="M0 42C-22 10-26-32 0-74C26-32 21 11 0 42Z" fill="#d89de8"/>
+  <path d="M0 42C-44 19-57-15-36-49C-24-30-11 8 0 42Z" fill="#9a5bc8"/>
+  <path d="M0 42C44 19 57-15 36-49C24-30 11 8 0 42Z" fill="#af71cf"/>
+ </g>
+ <g transform="translate(259 151) rotate(72) scale(.67)">
+  <path d="M0 42C-37 34-53 5-42-32Q-30-65 0-73Q32-57 44-34Q50 13 0 42Z" fill="url(#a)"/>
+  <path d="M0 42C-22 10-26-32 0-74C26-32 21 11 0 42Z" fill="#e3b0ed"/>
+  <path d="M0 42C-44 19-57-15-36-49C-24-30-11 8 0 42Z" fill="#a361d0"/>
+  <path d="M0 42C44 19 57-15 36-49C24-30 11 8 0 42Z" fill="#af71cf"/>
+ </g>
+</svg>

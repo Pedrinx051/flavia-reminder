@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 220" fill="none">
+ <defs><linearGradient id="book" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ca91dd"/><stop offset="1" stop-color="#9355b6"/></linearGradient><linearGradient id="petal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e1afe8"/><stop offset="1" stop-color="#a65bc4"/></linearGradient></defs>
+ <ellipse cx="119" cy="188" rx="95" ry="11" fill="#bf9bd1" opacity=".2"/>
+ <path d="M38 158l116-11 40 22-115 17z" fill="#8450a6"/>
+ <path d="M42 145l114-11 38 21-115 16z" fill="#d0a0e2"/>
+ <path d="M74 152l112-11v23L74 178z" fill="#fff4f4"/>
+ <path d="M38 134l116-11 40 22-115 16z" fill="url(#book)"/>
+ <path d="M36 97l117-17 37 22-114 18z" fill="#be85d4"/>
+ <path d="M41 88l108-13 40 22-114 18z" fill="#8653a6"/>
+ <path d="M70 108l107-13v28l-107 15z" fill="#fff2e5"/>
+ <path d="M38 78l110-14 39 22-114 18z" fill="url(#book)"/>
+ <path d="M94 104v22l13-7 11 5v-21" fill="#ef9dcd"/>
+ <path d="M140 76Q159 48 170 20" stroke="#80a77e" stroke-width="5" stroke-linecap="round"/>
+ <path d="M151 52Q137 32 118 37Q124 58 151 52" fill="#a5c3a5"/>
+ <path d="M157 39Q176 28 182 48Q167 61 157 39" fill="#b2caa9"/>
+ <path d="M167 38C143 30 140 12 154 3Q166 0 171 12Q184-4 195 11C201 25 184 37 167 38Z" fill="url(#petal)"/>
+ <path d="M167 38Q158 13 171 11Q181 22 167 38" fill="#efd1f4"/>
+ <g stroke="#d6a5de" stroke-width="3" stroke-linecap="round"><path d="M210 48l6-11M212 59h13M203 66l5 10"/></g>
+</svg>
