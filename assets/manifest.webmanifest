@@ -1,0 +1,15 @@
+{
+  "name":"Flávia Reminder 🌷",
+  "short_name":"Flávia",
+  "description":"Lembretes com carinho, tulipas roxas e bom humor.",
+  "lang":"pt-BR",
+  "start_url":"./",
+  "scope":"./",
+  "display":"standalone",
+  "background_color":"#fcf9fe",
+  "theme_color":"#fbf7fc",
+  "icons":[
+    {"src":"./icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"./icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"}
+  ]
+}
