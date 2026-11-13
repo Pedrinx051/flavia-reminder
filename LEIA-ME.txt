@@ -37,3 +37,9 @@ Abrir o arquivo localmente e abrir o site publicado depois cria origens
 separadas, portanto exporte e importe o backup para migrar.
 
 Nenhum servidor externo, cadastro ou serviço pago é necessário nesta versão.
+
+
+VERSÃO 3 — Pedro Pixel 🤨
+Atualizado o mascote do pop-up para assets/pedro-pixel.png.
+Para publicar no GitHub Pages: envie os arquivos desta pasta para a raiz do repositório flavia-reminder, mantendo a pasta assets. Substitua os arquivos existentes e confirme o commit.
+O site salva lembretes no navegador; notificações automáticas com app fechado ainda não foram implementadas.
