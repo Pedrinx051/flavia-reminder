@@ -62,6 +62,7 @@
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
     catch (e) { toast('Não foi possível salvar. Confira o armazenamento do navegador.'); console.warn(e); }
     render();
+    window.dispatchEvent(new Event('flavia-reminders-updated'));
   }
   function toast(message) {
     const el = $('toast');

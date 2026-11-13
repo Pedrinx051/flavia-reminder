@@ -71,7 +71,13 @@
     </div>
 
     <div class="page hidden" id="reminders">
-      <section class="content-section"><div class="section-heading"><h2>Todos os lembretes <span class="outline-heart">♡</span></h2></div><p class="page-caption">Sua rotina, do seu jeitinho. 🌷</p><div id="allTasks"></div><div class="notice">🔔 Os avisos automáticos na tela bloqueada do iPhone ainda não estão ativados nesta versão.</div></section>
+      <section class="content-section"><div class="section-heading"><h2>Todos os lembretes <span class="outline-heart">♡</span></h2></div><p class="page-caption">Sua rotina, do seu jeitinho. 🌷</p><div id="allTasks"></div><div class="push-panel" aria-label="Notificações no iPhone">
+        <strong>🔔 Notificações no iPhone</strong>
+        <p>Ative para receber os lembretes com o aplicativo fechado. Instale pelo Safari na tela inicial antes de ativar.</p>
+        <div class="push-actions"><button id="pushEnable" type="button" class="primary-btn">Ativar notificações</button><button id="pushTest" type="button" class="secondary-btn" disabled>Enviar teste</button></div>
+        <p id="pushStatus" role="status">Os lembretes continuam salvos no aparelho.</p>
+        <button id="pushReset" type="button" class="push-reset">Trocar código de acesso</button>
+      </div></section>
     </div>
 
     <div class="page hidden" id="calendar">
@@ -118,5 +124,6 @@
   </div>
   <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
   <script src="./app.js" defer></script>
+  <script src="./push.js" defer></script>
 </body>
 </html>
