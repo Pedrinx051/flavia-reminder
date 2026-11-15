@@ -14,9 +14,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=6.2">
+  <link rel="stylesheet" href="./styles.css?v=6.4">
   <title>Flávia Reminder 🌷</title>
-  <!-- V6.3: notificações ativadas apenas uma vez por aparelho, com verificação automática -->
+  <!-- V6.4: pets animados; notificações ativadas apenas uma vez por aparelho, com verificação automática -->
 </head>
 <body>
   <svg xmlns="http://www.w3.org/2000/svg" class="svg-icons" aria-hidden="true">
@@ -123,8 +123,12 @@
       <span class="pedro-spark one">✦</span><span class="pedro-spark two">✧</span>
     </div>
   </div>
+  <!-- Surpresas discretas dos pets: não bloqueiam os botões do aplicativo. -->
+  <div class="pet-peek hidden" id="petPeek" role="status" aria-live="polite" aria-label="">
+    <img id="petPeekImage" class="pet-peek-image" src="./assets/oliver-animado.gif" alt="" width="170" height="170">
+  </div>
   <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
-  <script src="./app.js?v=6.2" defer></script>
+  <script src="./app.js?v=6.4" defer></script>
   <script src="./push.js?v=6.3" defer></script>
 </body>
 </html>

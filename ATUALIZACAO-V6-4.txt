@@ -1,0 +1,17 @@
+FLÁVIA REMINDER V6.4 — OLIVER E LAYLA 🌷
+
+Novidades:
+- Quando salvar um lembrete que tenha Oliver no título ou na descrição, o gatinho aparece em pixel art, com Miau/Purr.
+- Quando salvar um lembrete com Layla, a cachorrinha aparece com Au au.
+- Ambos deslizam pelo canto da tela por aproximadamente 3 segundos e saem sozinhos.
+- Pedro Pixel, lembretes e Web Push permanecem como estavam.
+
+COMO ATUALIZAR O GITHUB (sem alterar Cloudflare):
+1. Na RAIZ do repositório, substitua: index.html, app.js, styles.css e sw.js.
+2. Dentro da pasta assets do repositório, envie: oliver-animado.gif e layla-animada.gif.
+3. Confirme os commits. Não mande arquivos de servidor ou chaves.
+4. Reabra o aplicativo. Não desinstale nem limpe os dados do navegador, para preservar os lembretes.
+5. Crie um lembrete com Oliver e outro com Layla para testar.
+
+OBS: A animação só é exibida quando o site está aberto e um lembrete é salvo.
+O sistema operacional não permite mostrar o bichinho em cima de outros aplicativos via PWA.

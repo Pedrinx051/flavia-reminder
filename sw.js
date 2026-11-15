@@ -1,7 +1,7 @@
 /* Flávia Reminder V6.3 — notificações com tulipas e ações seguras */
-const CACHE='flavia-reminder-v6.3';
+const CACHE='flavia-reminder-v6.4';
 const API='https://flavia-reminder-api.pedrohaubert52.workers.dev';
-const CORE=['./','./index.html','./styles.css','./app.js','./push.js','./icon.svg','./apple-touch-icon.png','./manifest.webmanifest','./assets/tulips.svg','./assets/study.svg','./assets/pedro-pixel.png','./assets/notificacao-tulipas.png','./assets/badge-tulipa.png'];
+const CORE=['./','./index.html','./styles.css','./app.js','./push.js','./icon.svg','./apple-touch-icon.png','./manifest.webmanifest','./assets/tulips.svg','./assets/study.svg','./assets/pedro-pixel.png','./assets/oliver-animado.gif','./assets/layla-animada.gif','./assets/notificacao-tulipas.png','./assets/badge-tulipa.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)));self.skipWaiting();});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(names=>Promise.all(names.filter(n=>n.startsWith('flavia-reminder-')&&n!==CACHE).map(n=>caches.delete(n)))));self.clients.claim();});
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||new URL(e.request.url).origin!==location.origin)return;

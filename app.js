@@ -1,4 +1,4 @@
-/* Flávia Reminder v2 — totalmente local, sem bibliotecas e sem servidor. */
+/* Flávia Reminder V6.4 — lembretes locais e integração Web Push separada. */
 (() => {
   'use strict';
   const STORAGE_KEY = 'flavia-reminder-v1'; // Mesmo nome da v1: mantém os lembretes já cadastrados.
@@ -18,6 +18,32 @@
   const isDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s) && dateString(dateAtNoon(s)) === s;
   const isTime = (s) => /^([01]\d|2[0-3]):[0-5]\d$/.test(s);
   const hasPedro = (title, description) => /(^|[^a-zà-ÿ])pedro(?=$|[^a-zà-ÿ])/i.test(`${title} ${description}`);
+  const hasPetName = (text, name) => new RegExp(`(^|[^a-zà-ÿ])${name}(?=$|[^a-zà-ÿ])`, 'i').test(text);
+  let petHideTimer = null;
+  function showPet(kind) {
+    const stage = $('petPeek');
+    const image = $('petPeekImage');
+    if (!stage || !image) return;
+    window.clearTimeout(petHideTimer);
+    stage.classList.remove('pet-in','pet-out');
+    // Recarrega o GIF para repetir a animação desde o começo a cada lembrete.
+    image.src = `./assets/${kind === 'oliver' ? 'oliver-animado.gif' : 'layla-animada.gif'}`;
+    image.alt = kind === 'oliver' ? 'Oliver, o gatinho pixelado, dizendo Miau ou Purr' : 'Layla, a cachorrinha pixelada, dizendo Au au';
+    stage.setAttribute('aria-label', kind === 'oliver' ? 'Oliver apareceu: miau!' : 'Layla apareceu: au au!');
+    stage.classList.remove('hidden');
+    // Garante que uma nova aparição reinicie a transição CSS.
+    void stage.offsetWidth;
+    stage.classList.add('pet-in');
+    petHideTimer = window.setTimeout(() => {
+      stage.classList.remove('pet-in');
+      stage.classList.add('pet-out');
+      petHideTimer = window.setTimeout(() => {
+        stage.classList.add('hidden');
+        stage.classList.remove('pet-out');
+      }, 430);
+    }, 2850);
+  }
+
 
   function normalizeTask(raw) {
     if (!raw || typeof raw !== 'object' || typeof raw.title !== 'string' ||
@@ -44,7 +70,10 @@
       repeat: allowedRepeat.includes(raw.repeat) ? raw.repeat : 'none',
       emoji: allowedEmoji.includes(raw.emoji) ? raw.emoji : '🌷',
       completed,
-      snoozes
+      snoozes,
+      // Preserva a conclusão para não reabrir tarefas e não repetir avisos.
+      historyClearedAt: typeof raw.historyClearedAt === 'string' && Number.isFinite(Date.parse(raw.historyClearedAt))
+        ? new Date(raw.historyClearedAt).toISOString() : null
     };
   }
 
@@ -123,12 +152,23 @@
     return `<div class="featured"><img class="feature-graphic" src="./assets/study.svg" alt="Livros decorados com uma tulipa"/><div class="feature-content"><span class="feature-tag">${tag} • ${timeOf(occurrence)}</span><h3>${escapeHTML(task.title)} ${escapeHTML(task.emoji)}</h3><p>${escapeHTML(task.desc || 'Você consegue! Um passo de cada vez. 💜')}</p><div class="actions"><button type="button" class="primary-btn" data-action="done" data-id="${escapeHTML(task.id)}" data-date="${date}">${icon('check')} Concluir</button><button type="button" class="secondary-btn" data-action="snooze" data-id="${escapeHTML(task.id)}" data-date="${date}">${icon('clock')} Adiar 10 min</button></div></div><span class="feature-deco">♡</span></div>`;
   }
 
+  // Oculta entradas antigas do histórico, mas mantém os indicadores de conclusão.
+  // O marcador acompanha cada tarefa e também é preservado no backup JSON.
+  function visibleHistory() {
+    return tasks.flatMap(task => Object.entries(task.completed || {})
+      .filter(([, stamp]) => stamp && (!task.historyClearedAt ||
+        (Number.isFinite(Date.parse(stamp)) && Date.parse(stamp) > Date.parse(task.historyClearedAt))))
+      .map(([date, stamp]) => ({task, date, stamp})))
+      .sort((a,b) => String(b.stamp).localeCompare(String(a.stamp)));
+  }
+
   function render() {
     $('todayLabel').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'}).replaceAll('.', '');
     const todayTasks = tasks.filter(task => occurs(task,today()));
     $('countToday').textContent = todayTasks.length;
     $('countPending').textContent = todayTasks.filter(task=>!isDone(task,today())).length;
-    $('countDone').textContent = tasks.reduce((n,task)=>n + Object.keys(task.completed||{}).length,0);
+    const history = visibleHistory();
+    $('countDone').textContent = history.length;
     const list = instances(today(),46);
     const notDone = list.filter(({task,date})=>!isDone(task,date));
     const forward = notDone.filter(x=>x.due >= new Date(`${today()}T00:00:00`).getTime());
@@ -148,9 +188,8 @@
     for (const occurrence of list) if (!nearest.has(occurrence.task.id) && occurrence.due >= new Date(`${today()}T00:00:00`).getTime()) nearest.set(occurrence.task.id,occurrence);
     const all = tasks.map(task => nearest.get(task.id) || {task,date:task.date,due:dueFor(task,task.date)}).sort((a,b)=>a.due-b.due);
     $('allTasks').innerHTML = all.length ? all.map(x=>taskRow(x.task,x.date)).join('') : emptyState('Sua agenda está vazia','Comece criando um lembrete. Um dia organizado faz toda diferença!',true);
-    const history = tasks.flatMap(task => Object.entries(task.completed||{}).filter(([,stamp])=>stamp).map(([date,stamp])=>({task,date,stamp})))
-      .sort((a,b)=>String(b.stamp).localeCompare(String(a.stamp)));
-    $('historyTasks').innerHTML = history.length ? history.map(x=>taskRow(x.task,x.date)).join('') : emptyState('O começo de tudo','Assim que concluir um lembrete, ele aparece no histórico.');
+    $('historyTasks').innerHTML = history.length ? history.map(x=>taskRow(x.task,x.date)).join('') : emptyState('Histórico em dia','Os registros antigos foram limpos. Novas conclusões aparecerão aqui.');
+    $('clearHistoryBtn').disabled = history.length === 0;
     renderCalendar();
   }
   function renderCalendar() {
@@ -269,11 +308,14 @@
     const title = $('title').value.trim(), desc = $('desc').value.trim(), date=$('date').value, time=$('time').value;
     if (!title || !isDate(date) || !isTime(time)) {toast('Preencha nome, data e horário.');return;}
     const old = tasks.find(x=>x.id===editingId);
-    const obj = {id:old?.id||uniqueId(),title,desc,date,time,repeat:$('repeat').value,emoji:$('emoji').value,completed:old?.completed||{},snoozes:old?.snoozes||{}};
+    const obj = {id:old?.id||uniqueId(),title,desc,date,time,repeat:$('repeat').value,emoji:$('emoji').value,completed:old?.completed||{},snoozes:old?.snoozes||{},historyClearedAt:old?.historyClearedAt||null};
     if (old) tasks = tasks.map(task=>task.id===old.id?obj:task);
     else tasks.push(obj);
     persist();closeForm();
+    const triggerText = `${title} ${desc}`;
     if (hasPedro(title,desc)) showPedro();
+    else if (hasPetName(triggerText,'oliver')) showPet('oliver');
+    else if (hasPetName(triggerText,'layla')) showPet('layla');
     else toast('Lembrete salvo com carinho 🌷');
   });
   $('deleteBtn').addEventListener('click',()=>{
@@ -289,6 +331,15 @@
   });
   $('prevMonth').addEventListener('click',()=>{calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()-1,1);renderCalendar();});
   $('nextMonth').addEventListener('click',()=>{calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()+1,1);renderCalendar();});
+  $('clearHistoryBtn').addEventListener('click',()=>{
+    const visible = visibleHistory();
+    if (!visible.length) return;
+    if (!confirm(`Limpar ${visible.length} registro(s) do histórico?\n\nOs lembretes já concluídos continuarão concluídos, e os próximos avisos não serão afetados. Essa limpeza será guardada no backup.`)) return;
+    const cutoff = new Date().toISOString();
+    for (const task of tasks) task.historyClearedAt = cutoff;
+    persist();
+    toast('Histórico limpo! Novas conclusões aparecerão aqui. 🌷');
+  });
   $('exportBtn').addEventListener('click',()=>{
     const blob=new Blob([JSON.stringify(tasks,null,2)],{type:'application/json'});
     const url=URL.createObjectURL(blob), a=document.createElement('a');
