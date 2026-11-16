@@ -65,3 +65,21 @@
 @keyframes pet-peek-exit{from{transform:translateX(0);opacity:1}to{transform:translateX(calc(100% + 30px));opacity:0}}
 @media (min-width:700px){.pet-peek{right:calc(50% - 245px);bottom:85px}}
 @media (prefers-reduced-motion:reduce){.pet-peek.pet-in{animation:pet-peek-fade-in .1s forwards}.pet-peek.pet-out{animation:pet-peek-fade-out .1s forwards}@keyframes pet-peek-fade-in{to{transform:translateX(0);opacity:1}}@keyframes pet-peek-fade-out{to{transform:translateX(0);opacity:0}}}
+
+
+/* V6.5 — Corrige zoom automático ao focar campos no Safari do iPhone.
+   Mantém o gesto de zoom acessível para quem precisa. */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { max-width: 100%; overflow-x: clip; }
+button, input, select, textarea { touch-action: manipulation; }
+.sheet input, .sheet textarea, .sheet select {
+  font-size: 16px;
+  line-height: 1.35;
+  -webkit-text-size-adjust: 100%;
+}
+.sheet { max-width: 100vw; overscroll-behavior: contain; }
+.form-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.form-pair > div { min-width: 0; }
+@supports (-webkit-touch-callout: none) {
+  .sheet { max-height: 94dvh; -webkit-overflow-scrolling: touch; }
+}
